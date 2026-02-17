@@ -1,7 +1,7 @@
 {
-  "name": "Neon Scientific Calculator",
+  "name": "NeonCalc MAX – Scientific",
   "short_name": "NeonCalc",
-  "description": "Neon cyberpunk scientific calculator with offline support.",
+  "description": "Full neon scientific calculator with hyperbolic, inverse, combinatorics, memory, EXP, history and offline support.",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#050505",
