@@ -1,0 +1,21 @@
+{
+  "name": "Neon Scientific Calculator",
+  "short_name": "NeonCalc",
+  "description": "Neon cyberpunk scientific calculator with offline support.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#00f0ff",
+  "icons": [
+    {
+      "src": "PWA/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "PWA/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
