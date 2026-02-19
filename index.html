@@ -14,88 +14,32 @@
 </head>
 <body>
 
-  <h1 class="title">NEONCALC MAX – SCIENTIFIC</h1>
+  <h1 class="title">NEONCALC MAX</h1>
 
-  <div class="layout">
-    <div class="calc-container">
+  <div class="calc-container">
 
-      <div class="top-bar">
-        <div class="mode-bar">
-          <span>Angle:</span>
-          <button id="degBtn" class="mode-btn active" onclick="setMode('DEG')">DEG</button>
-          <button id="radBtn" class="mode-btn" onclick="setMode('RAD')">RAD</button>
-        </div>
-        <div class="mem-indicator" id="memIndicator">M</div>
-      </div>
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-basic" onclick="switchTab('basic')">BASIC</button>
+      <button class="tab-btn" id="tab-sci" onclick="switchTab('sci')">SCI</button>
+      <button class="tab-btn" id="tab-adv" onclick="switchTab('adv')">ADV</button>
+      <button class="tab-btn" id="tab-mem" onclick="switchTab('mem')">MEM</button>
+      <button class="tab-btn" id="tab-hist" onclick="switchTab('hist')">HIST</button>
+    </div>
 
-      <input type="text" id="display" disabled>
-      <div id="secondaryDisplay" class="secondary-display"></div>
+    <!-- Displays -->
+    <input type="text" id="display" disabled>
+    <div id="secondaryDisplay" class="secondary-display"></div>
 
-      <!-- Memory row -->
-      <div class="row memory-row">
-        <button onclick="memClear()">MC</button>
-        <button onclick="memRecall()">MR</button>
-        <button onclick="memAdd()">M+</button>
-        <button onclick="memSub()">M-</button>
-      </div>
-
-      <!-- Scientific row 1 -->
+    <!-- BASIC TAB -->
+    <div class="tab-section active" id="section-basic">
       <div class="row">
-        <button onclick="press('(')">(</button>
-        <button onclick="press(')')">)</button>
-        <button onclick="press('mod(')">mod</button>
         <button onclick="backspace()">⌫</button>
+        <button id="btn-ce" onclick="clearDisplay()">CE</button>
+        <button onclick="toggleSign()">+/-</button>
+        <button onclick="press('%')">%</button>
       </div>
 
-      <!-- Scientific row 2 -->
-      <div class="row">
-        <button onclick="press('sin(')">sin</button>
-        <button onclick="press('cos(')">cos</button>
-        <button onclick="press('tan(')">tan</button>
-        <button onclick="press('^')">xʸ</button>
-      </div>
-
-      <!-- Scientific row 3 -->
-      <div class="row">
-        <button onclick="press('asin(')">asin</button>
-        <button onclick="press('acos(')">acos</button>
-        <button onclick="press('atan(')">atan</button>
-        <button onclick="press('sqrt(')">√x</button>
-      </div>
-
-      <!-- Scientific row 4 -->
-      <div class="row">
-        <button onclick="press('sinh(')">sinh</button>
-        <button onclick="press('cosh(')">cosh</button>
-        <button onclick="press('tanh(')">tanh</button>
-        <button onclick="press('1/(')">1/x</button>
-      </div>
-
-      <!-- Scientific row 5 -->
-      <div class="row">
-        <button onclick="press('ln(')">ln</button>
-        <button onclick="press('log(')">log</button>
-        <button onclick="press('10^')">10ˣ</button>
-        <button onclick="press('e^')">eˣ</button>
-      </div>
-
-      <!-- Scientific row 6 -->
-      <div class="row">
-        <button onclick="press('π')">π</button>
-        <button onclick="press('e')">e</button>
-        <button onclick="press('nCr(')">nCr</button>
-        <button onclick="press('nPr(')">nPr</button>
-      </div>
-
-      <!-- Scientific row 7 -->
-      <div class="row">
-        <button onclick="press('^2')">x²</button>
-        <button onclick="press('^3')">x³</button>
-        <button onclick="press('!')">x!</button>
-        <button onclick="press('EXP')">EXP</button>
-      </div>
-
-      <!-- Main keypad -->
       <div class="grid">
         <button onclick="press('7')">7</button>
         <button onclick="press('8')">8</button>
@@ -112,30 +56,82 @@
         <button onclick="press('3')">3</button>
         <button class="op" onclick="press('-')">−</button>
 
-        <button onclick="toggleSign()">+/-</button>
         <button onclick="press('0')">0</button>
         <button onclick="press('.')">.</button>
-        <button class="op" onclick="press('+')">+</button>
-
-        <button class="clear" onclick="clearDisplay()">CE</button>
-        <button class="percent" onclick="press('%')">%</button>
         <button class="equal" onclick="calculate()">=</button>
+        <button class="op" onclick="press('+')">+</button>
       </div>
-
     </div>
 
-    <div class="history-container">
-      <h2>History</h2>
+    <!-- SCI TAB -->
+    <div class="tab-section" id="section-sci">
+      <div class="row">
+        <button onclick="press('(')">(</button>
+        <button onclick="press(')')">)</button>
+        <button onclick="press('π')">π</button>
+        <button onclick="press('e')">e</button>
+      </div>
+      <div class="row">
+        <button onclick="press('sin(')">sin</button>
+        <button onclick="press('cos(')">cos</button>
+        <button onclick="press('tan(')">tan</button>
+        <button onclick="press('sqrt(')">√x</button>
+      </div>
+      <div class="row">
+        <button onclick="press('asin(')">asin</button>
+        <button onclick="press('acos(')">acos</button>
+        <button onclick="press('atan(')">atan</button>
+        <button onclick="press('^')">xʸ</button>
+      </div>
+      <div class="row">
+        <button onclick="press('ln(')">ln</button>
+        <button onclick="press('log(')">log</button>
+        <button onclick="press('^2')">x²</button>
+        <button onclick="press('^3')">x³</button>
+      </div>
+    </div>
+
+    <!-- ADV TAB -->
+    <div class="tab-section" id="section-adv">
+      <div class="row">
+        <button onclick="press('sinh(')">sinh</button>
+        <button onclick="press('cosh(')">cosh</button>
+        <button onclick="press('tanh(')">tanh</button>
+        <button onclick="press('1/(')">1/x</button>
+      </div>
+      <div class="row">
+        <button onclick="press('nCr(')">nCr</button>
+        <button onclick="press('nPr(')">nPr</button>
+        <button onclick="press('!')">x!</button>
+        <button onclick="press('mod(')">mod</button>
+      </div>
+      <div class="row">
+        <button onclick="press('10^')">10ˣ</button>
+        <button onclick="press('e^')">eˣ</button>
+        <button onclick="press('EXP')">EXP</button>
+        <button onclick="rnd()">rnd</button>
+      </div>
+    </div>
+
+    <!-- MEM TAB -->
+    <div class="tab-section" id="section-mem">
+      <div class="row">
+        <button onclick="memClear()">MC</button>
+        <button onclick="memRecall()">MR</button>
+        <button onclick="memAdd()">M+</button>
+        <button onclick="memSub()">M-</button>
+      </div>
+      <p class="mem-text">Memory value is used with current display.</p>
+    </div>
+
+    <!-- HIST TAB -->
+    <div class="tab-section" id="section-hist">
       <button class="history-clear" onclick="clearHistory()">Clear history</button>
       <ul id="historyList"></ul>
     </div>
+
   </div>
 
   <script src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
-    }
-  </script>
 </body>
 </html>
