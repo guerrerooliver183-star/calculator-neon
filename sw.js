@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neoncalc-max-v1.0-beta2';
+const CACHE_NAME = 'neoncalc-max-v1.0-beta3';
 
 const assets = [
   './',
