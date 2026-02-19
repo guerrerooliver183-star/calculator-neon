@@ -88,6 +88,10 @@ let memory = 0;
 let hasMemory = false;
 let history = [];
 
+// -------------------------
+// INPUT
+// -------------------------
+
 function press(value) {
   if (value === "EXP") {
     display.value += "E";
@@ -154,12 +158,25 @@ function evalSafe(expr) {
 }
 
 // -------------------------
-// HISTORY
+// HISTORY WITH LOCALSTORAGE
 // -------------------------
+
+function loadHistory() {
+  const saved = localStorage.getItem("neoncalc_history");
+  history = saved ? JSON.parse(saved) : [];
+  renderHistory();
+}
+
+function saveHistory() {
+  localStorage.setItem("neoncalc_history", JSON.stringify(history));
+}
 
 function addToHistory(expr, result) {
   history.unshift({ expr, result });
+
   if (history.length > 50) history.pop();
+
+  saveHistory();
   renderHistory();
 }
 
@@ -167,15 +184,21 @@ function renderHistory() {
   historyList.innerHTML = "";
   history.forEach(item => {
     const li = document.createElement("li");
-    li.innerHTML = `<span class="expr">${item.expr}</span><span class="res">= ${item.result}</span>`;
+    li.innerHTML = `
+      <span class="expr">${item.expr}</span>
+      <span class="res">= ${item.result}</span>
+    `;
     historyList.appendChild(li);
   });
 }
 
 function clearHistory() {
   history = [];
+  saveHistory();
   renderHistory();
 }
+
+loadHistory();
 
 // -------------------------
 // MAIN CALCULATE
