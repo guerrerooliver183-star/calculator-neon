@@ -1,30 +1,98 @@
+// -------------------------
+// LANGUAGE DETECTION SYSTEM
+// -------------------------
+
+let lang = "en";
+
+const translations = {
+  en: {
+    tabs: ["BASIC", "SCI", "ADV", "MEM", "HIST"],
+    ce: "CE",
+    clearHistory: "Clear history",
+    memText: "Memory value is used with current display."
+  },
+  es: {
+    tabs: ["BÁSICO", "CIENTÍFICA", "AVANZADA", "MEMORIA", "HISTORIAL"],
+    ce: "CE",
+    clearHistory: "Borrar historial",
+    memText: "El valor de memoria se usa con la pantalla actual."
+  }
+};
+
+function detectLanguage() {
+  const userLang = navigator.language || "en";
+  const code = userLang.split("-")[0].toLowerCase();
+  lang = translations[code] ? code : "en";
+  applyLanguage();
+}
+
+function applyLanguage() {
+  const t = translations[lang];
+
+  document.getElementById("tab-basic").textContent = t.tabs[0];
+  document.getElementById("tab-sci").textContent = t.tabs[1];
+  document.getElementById("tab-adv").textContent = t.tabs[2];
+  document.getElementById("tab-mem").textContent = t.tabs[3];
+  document.getElementById("tab-hist").textContent = t.tabs[4];
+
+  document.getElementById("btn-ce").textContent = t.ce;
+
+  const histClear = document.querySelector(".history-clear");
+  if (histClear) histClear.textContent = t.clearHistory;
+
+  const memText = document.querySelector(".mem-text");
+  if (memText) memText.textContent = t.memText;
+}
+
+detectLanguage();
+
+// -------------------------
+// TABS
+// -------------------------
+
+function switchTab(tab) {
+  const sections = {
+    basic: document.getElementById("section-basic"),
+    sci: document.getElementById("section-sci"),
+    adv: document.getElementById("section-adv"),
+    mem: document.getElementById("section-mem"),
+    hist: document.getElementById("section-hist")
+  };
+
+  const tabs = {
+    basic: document.getElementById("tab-basic"),
+    sci: document.getElementById("tab-sci"),
+    adv: document.getElementById("tab-adv"),
+    mem: document.getElementById("tab-mem"),
+    hist: document.getElementById("tab-hist")
+  };
+
+  Object.values(sections).forEach(s => s.classList.remove("active"));
+  Object.values(tabs).forEach(t => t.classList.remove("active"));
+
+  sections[tab].classList.add("active");
+  tabs[tab].classList.add("active");
+}
+
+switchTab("basic");
+
+// -------------------------
+// CALCULATOR LOGIC
+// -------------------------
+
 const display = document.getElementById("display");
 const secondaryDisplay = document.getElementById("secondaryDisplay");
-const memIndicator = document.getElementById("memIndicator");
 const historyList = document.getElementById("historyList");
 
-let angleMode = "DEG"; // DEG or RAD
 let memory = 0;
 let hasMemory = false;
 let history = [];
 
-// ----- Angle mode -----
-function setMode(mode) {
-  angleMode = mode;
-  document.getElementById("degBtn").classList.toggle("active", mode === "DEG");
-  document.getElementById("radBtn").classList.toggle("active", mode === "RAD");
-  secondaryDisplay.textContent = `Mode: ${angleMode}`;
-}
-
-// ----- Input handling -----
 function press(value) {
   if (value === "EXP") {
-    // Insert scientific notation marker
     display.value += "E";
     return;
   }
-
-  // Special patterns for 10^ and e^
   if (value === "10^") {
     display.value += "10^";
     return;
@@ -33,7 +101,6 @@ function press(value) {
     display.value += "e^";
     return;
   }
-
   display.value += value;
 }
 
@@ -48,53 +115,28 @@ function backspace() {
 
 function toggleSign() {
   if (!display.value) return;
-  if (display.value.startsWith("-")) {
-    display.value = display.value.slice(1);
-  } else {
-    display.value = "-" + display.value;
-  }
+  display.value = display.value.startsWith("-")
+    ? display.value.slice(1)
+    : "-" + display.value;
 }
 
 function rnd() {
-  const r = Math.random();
-  display.value = r.toString();
+  display.value = Math.random().toString();
 }
 
-// ----- Memory -----
-function updateMemoryIndicator() {
-  memIndicator.style.opacity = hasMemory ? 1 : 0.15;
-}
+// -------------------------
+// MEMORY
+// -------------------------
 
-function memClear() {
-  memory = 0;
-  hasMemory = false;
-  updateMemoryIndicator();
-}
+function memClear() { memory = 0; hasMemory = false; }
+function memRecall() { if (hasMemory) display.value += memory; }
+function memAdd() { const v = Number(evalSafe(display.value)); if (!isNaN(v)) { memory += v; hasMemory = true; } }
+function memSub() { const v = Number(evalSafe(display.value)); if (!isNaN(v)) { memory -= v; hasMemory = true; } }
 
-function memRecall() {
-  if (!hasMemory) return;
-  display.value += memory.toString();
-}
+// -------------------------
+// MATH HELPERS
+// -------------------------
 
-function memAdd() {
-  const val = Number(evalSafe(display.value));
-  if (!isNaN(val)) {
-    memory += val;
-    hasMemory = true;
-    updateMemoryIndicator();
-  }
-}
-
-function memSub() {
-  const val = Number(evalSafe(display.value));
-  if (!isNaN(val)) {
-    memory -= val;
-    hasMemory = true;
-    updateMemoryIndicator();
-  }
-}
-
-// ----- Math helpers -----
 function factorial(n) {
   n = Number(n);
   if (!Number.isInteger(n) || n < 0) return NaN;
@@ -103,64 +145,18 @@ function factorial(n) {
   return r;
 }
 
-function nCr(n, r) {
-  n = Number(n); r = Number(r);
-  if (r > n || n < 0 || r < 0) return NaN;
-  return factorial(n) / (factorial(r) * factorial(n - r));
-}
+function nCr(n, r) { return factorial(n) / (factorial(r) * factorial(n - r)); }
+function nPr(n, r) { return factorial(n) / factorial(n - r); }
 
-function nPr(n, r) {
-  n = Number(n); r = Number(r);
-  if (r > n || n < 0 || r < 0) return NaN;
-  return factorial(n) / factorial(n - r);
-}
-
-function toRad(x) {
-  return x * Math.PI / 180;
-}
-
-// Trig wrappers for DEG/RAD
-function sinMode(x) {
-  return angleMode === "DEG" ? Math.sin(toRad(x)) : Math.sin(x);
-}
-function cosMode(x) {
-  return angleMode === "DEG" ? Math.cos(toRad(x)) : Math.cos(x);
-}
-function tanMode(x) {
-  return angleMode === "DEG" ? Math.tan(toRad(x)) : Math.tan(x);
-}
-function asinMode(x) {
-  const v = Math.asin(x);
-  return angleMode === "DEG" ? v * 180 / Math.PI : v;
-}
-function acosMode(x) {
-  const v = Math.acos(x);
-  return angleMode === "DEG" ? v * 180 / Math.PI : v;
-}
-function atanMode(x) {
-  const v = Math.atan(x);
-  return angleMode === "DEG" ? v * 180 / Math.PI : v;
-}
-
-// Hiperbólicas
-function sinhMode(x) { return Math.sinh(x); }
-function coshMode(x) { return Math.cosh(x); }
-function tanhMode(x) { return Math.tanh(x); }
-function asinhMode(x) { return Math.asinh(x); }
-function acoshMode(x) { return Math.acosh(x); }
-function atanhMode(x) { return Math.atanh(x); }
-
-// Safe eval wrapper
 function evalSafe(expr) {
-  try {
-    // eslint-disable-next-line no-eval
-    return eval(expr);
-  } catch {
-    return NaN;
-  }
+  try { return eval(expr); }
+  catch { return NaN; }
 }
 
-// ----- History -----
+// -------------------------
+// HISTORY
+// -------------------------
+
 function addToHistory(expr, result) {
   history.unshift({ expr, result });
   if (history.length > 50) history.pop();
@@ -171,14 +167,7 @@ function renderHistory() {
   historyList.innerHTML = "";
   history.forEach(item => {
     const li = document.createElement("li");
-    const exprSpan = document.createElement("span");
-    exprSpan.className = "expr";
-    exprSpan.textContent = item.expr;
-    const resSpan = document.createElement("span");
-    resSpan.className = "res";
-    resSpan.textContent = "= " + item.result;
-    li.appendChild(exprSpan);
-    li.appendChild(resSpan);
+    li.innerHTML = `<span class="expr">${item.expr}</span><span class="res">= ${item.result}</span>`;
     historyList.appendChild(li);
   });
 }
@@ -188,72 +177,62 @@ function clearHistory() {
   renderHistory();
 }
 
-// ----- Main calculate -----
+// -------------------------
+// MAIN CALCULATE
+// -------------------------
+
 function calculate() {
   let expr = display.value;
   if (!expr) return;
 
   secondaryDisplay.textContent = expr;
 
-  // Factorial: 5! -> factorial(5)
+  // Factorial
   expr = expr.replace(/(\d+)!/g, "factorial($1)");
 
-  // nCr and nPr: nCr(a,b) / nPr(a,b)
+  // Combinatoria
   expr = expr.replace(/nCr\(([^,]+),([^()]+)\)/g, "nCr($1,$2)");
   expr = expr.replace(/nPr\(([^,]+),([^()]+)\)/g, "nPr($1,$2)");
 
-  // Constants
+  // Constantes
   expr = expr.replace(/π/g, "Math.PI");
   expr = expr.replace(/e/g, "Math.E");
 
-  // 10^x and e^x
-  expr = expr.replace(/10\^(\d+(\.\d+)?|\([^()]+\))/g, "Math.pow(10,$1)");
-  expr = expr.replace(/Math\.E\^(\d+(\.\d+)?|\([^()]+\))/g, "Math.pow(Math.E,$1)");
-  expr = expr.replace(/e\^(\d+(\.\d+)?|\([^()]+\))/g, "Math.pow(Math.E,$1)");
+  // Potencias especiales
+  expr = expr.replace(/10\^(\d+|\([^()]+\))/g, "Math.pow(10,$1)");
+  expr = expr.replace(/e\^(\d+|\([^()]+\))/g, "Math.pow(Math.E,$1)");
 
-  // Logs and sqrt
+  // Logs
   expr = expr.replace(/log\(/g, "Math.log10(");
   expr = expr.replace(/ln\(/g, "Math.log(");
+
+  // Raíz
   expr = expr.replace(/sqrt\(/g, "Math.sqrt(");
 
-  // x^2, x^3, x^y
+  // Potencias
   expr = expr.replace(/(\d+|\([^()]+\))\^2/g, "Math.pow($1,2)");
   expr = expr.replace(/(\d+|\([^()]+\))\^3/g, "Math.pow($1,3)");
-  expr = expr.replace(/(\d+|\([^()]+\))\^(\d+(\.\d+)?)/g, "Math.pow($1,$2)");
+  expr = expr.replace(/(\d+|\([^()]+\))\^(\d+)/g, "Math.pow($1,$2)");
 
-  // mod(a,b) -> (a % b)
+  // mod
   expr = expr.replace(/mod\(([^,]+),([^()]+)\)/g, "($1%$2)");
 
-  // Trig and inverse trig
-  expr = expr.replace(/sin\(/g, "sinMode(");
-  expr = expr.replace(/cos\(/g, "cosMode(");
-  expr = expr.replace(/tan\(/g, "tanMode(");
-  expr = expr.replace(/asin\(/g, "asinMode(");
-  expr = expr.replace(/acos\(/g, "acosMode(");
-  expr = expr.replace(/atan\(/g, "atanMode(");
-
-  // Hiperbólicas
-  expr = expr.replace(/sinh\(/g, "sinhMode(");
-  expr = expr.replace(/cosh\(/g, "coshMode(");
-  expr = expr.replace(/tanh\(/g, "tanhMode(");
-  expr = expr.replace(/asinh\(/g, "asinhMode(");
-  expr = expr.replace(/acosh\(/g, "acoshMode(");
-  expr = expr.replace(/atanh\(/g, "atanhMode(");
-
-  // Scientific notation: aE±b -> a * 10^b
+  // Notación científica
   expr = expr.replace(/(\d+(\.\d+)?)[eE]([+\-]?\d+)/g, "($1*Math.pow(10,$3))");
 
-  let result;
   try {
-    // eslint-disable-next-line no-eval
-    result = eval(expr);
+    const result = eval(expr);
+
     if (typeof result === "number" && !isNaN(result)) {
       display.value = result;
       addToHistory(secondaryDisplay.textContent, result);
     } else {
       display.value = "Error";
     }
+
   } catch (e) {
     display.value = "Error";
   }
 }
+
+// End of app.js
